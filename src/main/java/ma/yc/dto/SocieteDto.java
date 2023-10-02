@@ -5,9 +5,11 @@ import ma.yc.model.Patient;
 import java.util.List;
 
 public class SocieteDto {
-    public int id;
+    public String id;
 
     public String nom;
     public String description;
+
+    public String password;
     public List<PatientDto> patientDtos;
 }

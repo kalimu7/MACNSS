@@ -9,11 +9,14 @@ import java.util.List;
 public class PatientDto {
     public String matricule;
     public String nom;
-    public float CotisationSalaire;
+    public int cotisationSalaire;
+    public String idsociete;
+    public float salaire;
+    public float salaireRetrait;
+    public String statusRetrait;
+    public int numberWorkingdays;
 
-    public float Salaire;
-    public SalaireRetraitDto salaireRetraitDto;
-
+    public int pensionVeillesse;
     public SocieteDto societeDto;
 
 

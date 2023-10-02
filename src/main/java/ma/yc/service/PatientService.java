@@ -12,5 +12,7 @@ public interface PatientService {
 
         boolean authentification(PatientDto patientDto);
         List<DossierDto> consulterDossiers(String Matricule);
-       DossierDto consulterDossierParCode(String CodeDossier);
+        DossierDto consulterDossierParCode(String CodeDossier);
+
+
 }

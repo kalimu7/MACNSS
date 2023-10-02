@@ -7,19 +7,69 @@ public class Patient {
 
     private String nom;
     private List<Dossier> dossiers;
+    private int CotisationSalaire;
 
-    private float CotisationSalaire;
-
+    private int pensionVeillesse;
     private float Salaire;
 
-    private SalaireRetrait salaireRetrait;
+    private int NombreJourtravaille;
+
+    private String idSociete;
+
+    private String statusretrait;
+
+    private float salareRetrait;
+
+    public int getPensionVeillesse() {
+        return pensionVeillesse;
+    }
+
+    public void setPensionVeillesse(int pensionVeillesse) {
+        this.pensionVeillesse = pensionVeillesse;
+    }
+
+    public int getNombreJourtravaille() {
+        return NombreJourtravaille;
+    }
+
+    public void setNombreJourtravaille(int nombreJourtravaille) {
+        NombreJourtravaille = nombreJourtravaille;
+    }
+
+    public String getIdSociete() {
+        return idSociete;
+    }
+
+    public void setIdSociete(String idSociete) {
+        this.idSociete = idSociete;
+    }
+
+    public String getStatusretrait() {
+        return statusretrait;
+    }
+
+    public void setStatusretrait(String statusretrait) {
+        this.statusretrait = statusretrait;
+    }
+
+    public Societe getSociete() {
+        return societe;
+    }
+
+    public void setSociete(Societe societe) {
+        this.societe = societe;
+    }
+
+
+
+
 
     private Societe societe;
-    public float getCotisationSalaire() {
+    public int getCotisationSalaire() {
         return CotisationSalaire;
     }
 
-    public void setCotisationSalaire(float cotisationSalaire) {
+    public void setCotisationSalaire(int cotisationSalaire) {
         CotisationSalaire = cotisationSalaire;
     }
 
@@ -53,6 +103,14 @@ public class Patient {
 
     public String getNom() {
         return nom;
+    }
+
+    public float getSalareRetrait() {
+        return salareRetrait;
+    }
+
+    public void setSalareRetrait(float salareRetrait) {
+        this.salareRetrait = salareRetrait;
     }
 
     public void setNom(String nom) {

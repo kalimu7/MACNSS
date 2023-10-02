@@ -61,4 +61,7 @@ public class PatientServiceImpl implements PatientService {
         DossierDto dossierDto =  this.dossierMapper.toDto(dossier);
         return  dossierDto;
     }
+
+
+
 }

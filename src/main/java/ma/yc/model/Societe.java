@@ -3,16 +3,26 @@ package ma.yc.model;
 import java.util.List;
 
 public class Societe {
-    private int id;
+    private String id;//matricule
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     private String nom;
     private String description;
+
     private List<Patient> patient;
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

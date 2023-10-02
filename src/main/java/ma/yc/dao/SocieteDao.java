@@ -10,7 +10,9 @@ public interface SocieteDao {
 
     void entreNobmreJourTraivaille(int NJT);
 
-    void dimunierNombreJourTravaille(int NJT);
+    void augmenterNombreJourTravaille(int NJT);
+
+    boolean accederSocieteDashboard(String societeid,String password);
 
 
 }

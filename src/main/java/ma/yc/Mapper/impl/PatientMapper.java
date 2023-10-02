@@ -18,7 +18,12 @@ public class PatientMapper implements Mapper<PatientDto , Patient> {
         Patient patient = new Patient();
         patient.setMatricule(patientDto.matricule);
         patient.setNom(patientDto.nom);
-//        patient.setDossiers(patientDto.dossiers);
+        patient.setIdSociete(patientDto.idsociete);
+        patient.setSalaire(patientDto.salaire);
+        patient.setCotisationSalaire(patientDto.cotisationSalaire);
+        patient.setNombreJourtravaille(patientDto.numberWorkingdays);
+        patient.setStatusretrait(patientDto.statusRetrait);
+        patient.setPensionVeillesse(patientDto.pensionVeillesse);
         return patient;
     }
 
