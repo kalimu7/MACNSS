@@ -6,13 +6,15 @@ import ma.yc.dao.SocieteDao;
 import ma.yc.dao.impl.SocieteDaoImp;
 import ma.yc.dto.PatientDto;
 import ma.yc.dto.SocieteDto;
+import ma.yc.enums.statusRetraitment;
 import ma.yc.model.Patient;
 import ma.yc.model.Societe;
 import ma.yc.service.SocieteService;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.SimpleFormatter;
 
 
 public class SocieteServiceImp implements SocieteService {
@@ -26,10 +28,8 @@ public class SocieteServiceImp implements SocieteService {
     }
     @Override
     public boolean ajouteSociete(SocieteDto societeDto) {
-
         Societe societe = this.societeMapper.toEntity(societeDto);
         boolean returnvalue = this.societeDao.ajouteSociete(societe);
-
         if(returnvalue == true){
             return true;
         }else{
@@ -41,27 +41,20 @@ public class SocieteServiceImp implements SocieteService {
     @Override
     public boolean ajouteEmployee(List<PatientDto> patientDtos, String idsociete) {
         for (PatientDto p: patientDtos){
-            if(p.numberWorkingdays > 3210){
-                p.statusRetrait = "Peut Benefice";
-                int Plus = p.numberWorkingdays - 3210;
-                if(Plus > 0){
-                    Plus = Plus/216;
-                    p.pensionVeillesse = 50 + Plus;
-                    p.salaireRetrait = p.salaire * (p.pensionVeillesse / 100);
-                }else{
-                    p.pensionVeillesse = 50;
-                    p.salaireRetrait = p.salaire / 2;
-                }
-
-            }else{
-                p.statusRetrait = "Ne Peut Pas Benefice";
+            //todo : implement max 70 %;change the logic to 1320
+                p.statusRetrait = statusRetraitment.ne_peut_pas_bénéficier.toString();
                 p.pensionVeillesse = 0;
                 p.salaireRetrait = 0;
-            }
+                p.numberWorkingdays = 0;
+
             Patient patient =  this.patientMapper.toEntity(p);
             this.societeDao.ajouteEmployee(patient);
         }
         return false;
+    }
+    @Override
+    public void calculateRetraiteSalary(String matricule){
+        this.societeDao.calculateRetriatSalary(matricule);
     }
 
     @Override
@@ -69,4 +62,24 @@ public class SocieteServiceImp implements SocieteService {
         boolean state =  this.societeDao.accederSocieteDashboard(idSociete,Password);
         return state;
     }
+
+    @Override
+    public List<PatientDto> SelectAllYourEmployee(String idSociete) {
+
+        return null;
+    }
+
+    @Override
+    public boolean changesociete(String matricule, String societeid) {
+        return this.societeDao.ChangePatienCompany(matricule,societeid);
+    }
+
+    @Override
+    public boolean checkifemployeealredyexist(String matricule) {
+        return this.societeDao.checkIfuserAlreadyexist(matricule);
+    }
+    public void augmenterNombreJourTravaille(String matricule, int NJT) {
+        this.societeDao.augmenterNombreJourTravaille(matricule,NJT);
+    }
 }
+

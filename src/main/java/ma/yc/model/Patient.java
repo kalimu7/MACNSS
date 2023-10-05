@@ -1,5 +1,8 @@
 package ma.yc.model;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public class Patient {
@@ -8,18 +11,35 @@ public class Patient {
     private String nom;
     private List<Dossier> dossiers;
     private int CotisationSalaire;
-
     private int pensionVeillesse;
     private float Salaire;
-
+    private float salaireRetrait;
     private int NombreJourtravaille;
 
     private String idSociete;
 
     private String statusretrait;
 
-    private float salareRetrait;
+    public LocalDate getDatenaissance() {
+        return datenaissance;
+    }
 
+    public void setDatenaissance(LocalDate datenaissance) {
+        this.datenaissance = datenaissance;
+    }
+
+    private LocalDate datenaissance;
+
+
+
+
+    public float getSalaireRetrait() {
+        return salaireRetrait;
+    }
+
+    public void setSalaireRetrait(float salaireRetrait) {
+        this.salaireRetrait = salaireRetrait;
+    }
     public int getPensionVeillesse() {
         return pensionVeillesse;
     }
@@ -60,10 +80,6 @@ public class Patient {
         this.societe = societe;
     }
 
-
-
-
-
     private Societe societe;
     public int getCotisationSalaire() {
         return CotisationSalaire;
@@ -72,18 +88,6 @@ public class Patient {
     public void setCotisationSalaire(int cotisationSalaire) {
         CotisationSalaire = cotisationSalaire;
     }
-
-    public float getSalaire() {
-        return Salaire;
-    }
-
-    public void setSalaire(float salaire) {
-        Salaire = salaire;
-    }
-
-
-
-
 
     public String getMatricule() {
         return matricule;
@@ -105,15 +109,15 @@ public class Patient {
         return nom;
     }
 
-    public float getSalareRetrait() {
-        return salareRetrait;
-    }
-
-    public void setSalareRetrait(float salareRetrait) {
-        this.salareRetrait = salareRetrait;
-    }
-
     public void setNom(String nom) {
         this.nom = nom;
+    }
+
+    public float getSalaire() {
+        return Salaire;
+    }
+
+    public void setSalaire(float salaire) {
+        this.Salaire = salaire;
     }
 }

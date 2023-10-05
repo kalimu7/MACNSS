@@ -2,22 +2,29 @@ package ma.yc.GUI;
 
 import ma.yc.core.Print;
 import ma.yc.dto.PatientDto;
-import ma.yc.dto.SalaireRetraitDto;
+import ma.yc.dto.SalaireDto;
 import ma.yc.dto.SocieteDto;
-import ma.yc.model.SalaireRetrait;
+import ma.yc.model.Salaire;
+import ma.yc.service.SalaireService;
 import ma.yc.service.SocieteService;
+import ma.yc.service.impl.SalaireServiceImp;
 import ma.yc.service.impl.SocieteServiceImp;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class SocieteGUI implements DisplayGUI{
 
     private SocieteService societeService;
+    private SalaireService salaireService;
+
     public SocieteGUI(){
         this.societeService = new SocieteServiceImp();
+        this.salaireService = new SalaireServiceImp();
+
     }
     @Override
     public int displayMainOptions(Scanner scanner) {
@@ -65,34 +72,39 @@ public class SocieteGUI implements DisplayGUI{
                     String Choi = scanner.nextLine();
                     if(Choi.equals("y")){
                         List<PatientDto> patientDtos = new ArrayList<PatientDto>();
-
+                        List<SalaireDto> salaireDtos = new ArrayList<SalaireDto>();
                         String choicee = "y";
                         while(choicee.equals("y")){
                             Print.log("Enter matricule Number of your employee");
                             String matricule = scanner.nextLine();
                             String societeid = id;
-                            Print.log("enter the salary");
+                            //todo : implement a condition to check if its already exits
+                            Print.log("enter the actual salary ");
                             float salaire = scanner.nextFloat();
+                            SalaireDto salaireDto = new SalaireDto();
+                            salaireDto.salaire = salaire;
+                            salaireDto.societeid = societeid;
+                            salaireDto.patientid = matricule;
+                            salaireDtos.add(salaireDto);
                             Print.log("enter cotisatio de salaire");
                             int cotisationSalaire = scanner.nextInt();
-                            Print.log("enteer nombre of working days ");
-                            int numberwd = scanner.nextInt();
-                            PatientDto patientDto = new PatientDto();
-                            patientDto.matricule = matricule;
-                            patientDto.idsociete = id;
-                            patientDto.numberWorkingdays = numberwd;
-                            patientDto.salaire = salaire;
-                            patientDto.cotisationSalaire = cotisationSalaire;
-                            patientDtos.add(patientDto);
-
+                            scanner.nextLine();
+                            Print.log("enter data of birth yyyy-mm-dd ");
+                            String Dateofbirth = scanner.nextLine();
+                            PatientDto patientDto1 = new PatientDto();
+                            patientDto1.matricule = matricule;
+                            patientDto1.idsociete = id;
+                            patientDto1.datadeNaissance = Dateofbirth;
+                            patientDto1.salaire = salaire;
+                            patientDto1.cotisationSalaire = cotisationSalaire;
+                            patientDtos.add(patientDto1);
                             scanner.nextLine();
                             Print.log("enter new employee y/n");
-
                             choicee = scanner.nextLine();
 
                         }
                         this.societeService.ajouteEmployee(patientDtos,id);
-
+                        this.salaireService.addSalaire(salaireDtos);
                     }else{
                         Print.log("there is a problem");
                     }
@@ -111,7 +123,7 @@ public class SocieteGUI implements DisplayGUI{
                 String Password = scanner.nextLine();
                 //todo : check if the societe exist;
                 if(this.societeService.accederDashboardSociete(idSociete,Password)){
-                        this.SocieteDashboard(scanner);
+                        this.SocieteDashboard(scanner,idSociete);
                 }else{
                     System.out.println("something went wrong");
                 }
@@ -121,29 +133,87 @@ public class SocieteGUI implements DisplayGUI{
         }
         return 0;
     }
-    public void SocieteDashboard(Scanner scanner){
+    public void SocieteDashboard(Scanner scanner,String Soieteid){
+        scanner = new Scanner(System.in);
         Print.log("1- Add new Employee");
         Print.log("2- Increase Number of working days");
-        Print.log("3- Descrease Number of workinf days");
-        /*
-        Print.log("3- Calculate retiring Salary");
-        Print.log("4- Change the Retiring Pension");
-        Print.log("5- Check if you can benifice of Retiring");
-        Print.log("6- Check all your employee");
-        */
+        Print.log("3- Descrease Number of working days");
+        Print.log("4- check all your employee");
 
-        int choice = scanner.nextInt();
+        String choiceStr = scanner.nextLine();
+        int choice = Integer.parseInt(choiceStr);
         switch (choice){
             case 1:
                 //todo: need to implemnt logic here
-                String idSociete = "";
-                //PatientDto patientDtos = null;
-                //this.societeService.ajouteEmployee(patientDtos,idSociete);
-                break;
+
+                    List<PatientDto> patientDtos = new ArrayList<PatientDto>();
+                    List<SalaireDto> salaireDtos = new ArrayList<SalaireDto>();
+                    String choicee = "y";
+                    while (choicee.equals("y")) {
+                        Print.log("Enter matricule Number of your employee");
+                        String matricule = scanner.nextLine();
+                        if(this.societeService.checkifemployeealredyexist(matricule)){
+                            Print.log("this employee already exist,now he is forwarded to this societe");
+                            this.societeService.changesociete(matricule,Soieteid);
+                            continue;
+                        }
+                        String societeid = Soieteid;
+                        //todo : implement a condition to check if its already exits
+                        Print.log("enter the actual salary ");
+                        float salaire = scanner.nextFloat();
+                        scanner.nextLine();
+                        SalaireDto salaireDto = new SalaireDto();
+                        salaireDto.salaire = salaire;
+                        salaireDto.societeid = societeid;
+                        salaireDto.patientid = matricule;
+                        salaireDtos.add(salaireDto);
+                        Print.log("enter data of birth yyyy-mm-dd ");
+                        String Dateofbirth = scanner.nextLine();
+                        Print.log("enter cotisatio de salaire");
+                        int cotisationSalaire = scanner.nextInt();
+                        PatientDto patientDto1 = new PatientDto();
+                        patientDto1.matricule = matricule;
+                        patientDto1.idsociete = Soieteid;
+                        patientDto1.salaire = salaire;
+                        patientDto1.cotisationSalaire = cotisationSalaire;
+                        patientDto1.datadeNaissance = Dateofbirth;
+                        patientDtos.add(patientDto1);
+                        scanner.nextLine();
+                        Print.log("enter new employee y/n");
+                        choicee = scanner.nextLine();
+                    }
+                    this.societeService.ajouteEmployee(patientDtos,Soieteid);
+                    this.salaireService.addSalaire(salaireDtos);
+                    this.SocieteDashboard(scanner,Soieteid);
+                    break;
             case 2:
-                //todo : need to implement logic here
+                Print.log("entrer le matricule de patient");
+                String matricule = scanner.nextLine();
+                if(this.societeService.checkifemployeealredyexist(matricule)){
+                    Print.log("entrer le nombre de jour travaille par ce employée");
+                    int NJT = scanner.nextInt();
+
+                    this.societeService.augmenterNombreJourTravaille(matricule,NJT);
+                }else{
+                    Print.log("there is no employee with this matricule");
+                }
+
+                this.SocieteDashboard(scanner,Soieteid);
+                break;
+                //todo : increase working day
+
+            case 3:
+                //todo : decrease working day
+                break;
+            case 4:
+                // todo:
                 break;
 
+
+
+
+
+                //todo : check al your employee
 
 
         }

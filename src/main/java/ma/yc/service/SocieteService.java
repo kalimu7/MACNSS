@@ -10,7 +10,15 @@ public interface SocieteService {
 
         boolean ajouteEmployee(List<PatientDto> patientDtos, String idSociete);
 
-        boolean accederDashboardSociete(String idSociete,String Password);
+        void calculateRetraiteSalary(String matricule);
+
+        boolean accederDashboardSociete(String idSociete, String Password);
+
+        List<PatientDto> SelectAllYourEmployee(String idSociete);
+
+        public boolean changesociete(String matricule, String societeid);
+        public boolean checkifemployeealredyexist(String matricule);
+        public void augmenterNombreJourTravaille(String matricule, int NJT);
 
 
 
