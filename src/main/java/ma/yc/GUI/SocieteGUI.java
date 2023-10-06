@@ -1,9 +1,11 @@
 package ma.yc.GUI;
 
 import ma.yc.core.Print;
+import ma.yc.dao.impl.SocieteDaoImp;
 import ma.yc.dto.PatientDto;
 import ma.yc.dto.SalaireDto;
 import ma.yc.dto.SocieteDto;
+import ma.yc.model.Patient;
 import ma.yc.model.Salaire;
 import ma.yc.service.SalaireService;
 import ma.yc.service.SocieteService;
@@ -31,13 +33,8 @@ public class SocieteGUI implements DisplayGUI{
         Print.log("Bienvenue dans l'application de gestion des patients");
         Print.log("1- Add your Own Company");
         Print.log("2- Get access To your Company Dahsboard");
-        /*
-        Print.log("2- Add new Employee");
-        Print.log("3- Update Number of Working Day");//including increasing and decreasing
-        Print.log("4-Calculate retiring Salary");
-        Print.log("5-Change the Retiring Pension");
-        Print.log("6-Check if you can benifice of Retiring");
-        */
+        Print.log("3- Check your Retirement Salary");
+
 
         int choice = scanner.nextInt();
         scanner.nextLine();
@@ -45,6 +42,7 @@ public class SocieteGUI implements DisplayGUI{
             case 1:
                 Print.log("add your Own Societe");
                 Print.log("Enter the id of your society");
+                //todo : add a condition;
                 String id = scanner.nextLine();
 
                 Print.log("Enter password to acceess your company next time");
@@ -57,7 +55,7 @@ public class SocieteGUI implements DisplayGUI{
                 Print.log("entrer la description de votre entreprise");
                 String description = scanner.nextLine();
 
-                // todo : implement the logic
+
 
                 SocieteDto societeDto = new SocieteDto();
                 societeDto.id = id;
@@ -71,21 +69,20 @@ public class SocieteGUI implements DisplayGUI{
                     Print.log("Add Employees y/n");
                     String Choi = scanner.nextLine();
                     if(Choi.equals("y")){
-                        List<PatientDto> patientDtos = new ArrayList<PatientDto>();
-                        List<SalaireDto> salaireDtos = new ArrayList<SalaireDto>();
+                       List<PatientDto> patientDtos = new ArrayList<PatientDto>();
+
                         String choicee = "y";
                         while(choicee.equals("y")){
                             Print.log("Enter matricule Number of your employee");
                             String matricule = scanner.nextLine();
                             String societeid = id;
-                            //todo : implement a condition to check if its already exits
+                            if(this.societeService.checkifemployeealredyexist(matricule)){
+                                Print.log("this employee already exist,now he is forwarded to this societe");
+                                this.societeService.changesociete(matricule,societeid);
+                                continue;
+                            }
                             Print.log("enter the actual salary ");
                             float salaire = scanner.nextFloat();
-                            SalaireDto salaireDto = new SalaireDto();
-                            salaireDto.salaire = salaire;
-                            salaireDto.societeid = societeid;
-                            salaireDto.patientid = matricule;
-                            salaireDtos.add(salaireDto);
                             Print.log("enter cotisatio de salaire");
                             int cotisationSalaire = scanner.nextInt();
                             scanner.nextLine();
@@ -98,13 +95,13 @@ public class SocieteGUI implements DisplayGUI{
                             patientDto1.salaire = salaire;
                             patientDto1.cotisationSalaire = cotisationSalaire;
                             patientDtos.add(patientDto1);
-                            scanner.nextLine();
+
                             Print.log("enter new employee y/n");
                             choicee = scanner.nextLine();
 
                         }
                         this.societeService.ajouteEmployee(patientDtos,id);
-                        this.salaireService.addSalaire(salaireDtos);
+
                     }else{
                         Print.log("there is a problem");
                     }
@@ -128,17 +125,24 @@ public class SocieteGUI implements DisplayGUI{
                     System.out.println("something went wrong");
                 }
                 break;
+            case 3:
+                Print.log("entrer votre matricule ");
+                String Matricule = scanner.nextLine();
+                PatientDto patientDto = this.societeService.checkYourRetirementSalary(Matricule);
+                Print.log("your salary " + patientDto.salaire);
+                Print.log("statusRetraitment " + patientDto.statusRetrait);
+                Print.log("your Retirement Salary " + patientDto.salaireRetrait);
+
             default:
                 Print.log("Enter a valid choice");
         }
         return 0;
     }
     public void SocieteDashboard(Scanner scanner,String Soieteid){
+        this.societeService.calculateRetraiteSalary();
         scanner = new Scanner(System.in);
         Print.log("1- Add new Employee");
         Print.log("2- Increase Number of working days");
-        Print.log("3- Descrease Number of working days");
-        Print.log("4- check all your employee");
 
         String choiceStr = scanner.nextLine();
         int choice = Integer.parseInt(choiceStr);
@@ -147,7 +151,7 @@ public class SocieteGUI implements DisplayGUI{
                 //todo: need to implemnt logic here
 
                     List<PatientDto> patientDtos = new ArrayList<PatientDto>();
-                    List<SalaireDto> salaireDtos = new ArrayList<SalaireDto>();
+
                     String choicee = "y";
                     while (choicee.equals("y")) {
                         Print.log("Enter matricule Number of your employee");
@@ -162,11 +166,7 @@ public class SocieteGUI implements DisplayGUI{
                         Print.log("enter the actual salary ");
                         float salaire = scanner.nextFloat();
                         scanner.nextLine();
-                        SalaireDto salaireDto = new SalaireDto();
-                        salaireDto.salaire = salaire;
-                        salaireDto.societeid = societeid;
-                        salaireDto.patientid = matricule;
-                        salaireDtos.add(salaireDto);
+
                         Print.log("enter data of birth yyyy-mm-dd ");
                         String Dateofbirth = scanner.nextLine();
                         Print.log("enter cotisatio de salaire");
@@ -183,7 +183,6 @@ public class SocieteGUI implements DisplayGUI{
                         choicee = scanner.nextLine();
                     }
                     this.societeService.ajouteEmployee(patientDtos,Soieteid);
-                    this.salaireService.addSalaire(salaireDtos);
                     this.SocieteDashboard(scanner,Soieteid);
                     break;
             case 2:
@@ -203,7 +202,7 @@ public class SocieteGUI implements DisplayGUI{
                 //todo : increase working day
 
             case 3:
-                //todo : decrease working day
+
                 break;
             case 4:
                 // todo:

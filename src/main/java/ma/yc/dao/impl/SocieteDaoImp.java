@@ -12,6 +12,7 @@ import java.sql.*;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SocieteDaoImp implements SocieteDao {
@@ -88,8 +89,8 @@ public class SocieteDaoImp implements SocieteDao {
                     LocalDate localDate = LocalDate.now();
                     Patient patient = this.fetchPatientBYMatricule(matricule);
                     Period age = Period.between(patient.getDatenaissance(),localDate);
-                    Print.log("age of employee " + age.getYears());
-                    Print.log("print the pension veillesse " + patient.getPensionVeillesse());
+                    //Print.log("age of employee " + age.getYears());
+                    //Print.log("print the pension veillesse " + patient.getPensionVeillesse());
                     if(patient.getPensionVeillesse() < 70  ){
                         this.changeStatus(matricule,patient.getNombreJourtravaille(), age.getYears());
                     }
@@ -103,7 +104,7 @@ public class SocieteDaoImp implements SocieteDao {
 
     public void changeStatus(String matricule,int NWD,int age){
         try {
-            Print.log("here inside the change status method WC " + matricule + "  " + " age " + age + " nwd " + NWD);
+            //Print.log("here inside the change status method WC " + matricule + "  " + " age " + age + " nwd " + NWD);
             if (NWD > 1320 && NWD < 3240 && age >= 55) {
                 String Query = " UPDATE `patients` SET `PensionV` = ? ,`statusRetraitment` = ? where matricule = ? ";
                 int PV = 50 ;
@@ -113,7 +114,7 @@ public class SocieteDaoImp implements SocieteDao {
                 preparedStatement.setString(3,matricule);
                 preparedStatement.executeUpdate();
             }else if(NWD > 1320 && NWD < 3240 ){
-                Print.log("here inside of NWD > 1320 && NWD < 3240 ");
+                //Print.log("here inside of NWD > 1320 && NWD < 3240 ");
                 String Query = "update patients set PensionV = ?  where matricule = ?";
                 int PV = 50 ;
                 PreparedStatement preparedStatement = this.connection.prepareStatement(Query);
@@ -125,7 +126,7 @@ public class SocieteDaoImp implements SocieteDao {
                 int plus = NWD - 3240;
                 plus = plus / 216;
                 int PV = 50 + plus;
-                String Query = "update patients set PensionV = ?  statusRetraitment = ? where matricule = ? ";
+                String Query = "update patients set PensionV = ? , statusRetraitment = ? where matricule = ? ";
                 PreparedStatement preparedStatement2 = this.connection.prepareStatement(Query);
                 preparedStatement2.setInt(1,PV);
                 preparedStatement2.setString(2, statusRetraitment.peut_bénéficier.toString());
@@ -224,22 +225,102 @@ public class SocieteDaoImp implements SocieteDao {
     public List<Patient> SelectAllYourEmployee(String societeid) {
         return null;
     }
+
+
+    public List<Patient> selectEligible(){
+        try {
+            List<Patient> patients = new ArrayList<Patient>();
+            String Query = "SELECT *FROM patients WHERE patients.statusRetraitment =  'peut_bénéficier'";
+            PreparedStatement preparedStatement = this.connection.prepareStatement(Query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                Patient patient = new Patient();
+                patient.setMatricule(resultSet.getString("matricule"));
+                patient.setPensionVeillesse(resultSet.getInt("PensionV"));
+                patients.add(patient);
+            }
+            return patients;
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
     @Override
-    public void calculateRetriatSalary(String matricule){
+    public float calculateRetriatSalary(String matricule, int PV){
         try{
-            String Querry = "SELECT SUM(salaire) FROM (SELECT salaire FROM salaire WHERE matricule = ? ORDER BY id DESC LIMIT 96 ) AS subquery;\n";
+
+            String Querry = "SELECT SUM(salaire) FROM (SELECT salaire FROM salaire WHERE matricule = ? ORDER BY id DESC LIMIT 96 ) AS subquery;";
             PreparedStatement preparedStatement = this.connection.prepareStatement(Querry);
             preparedStatement.setString(1,matricule);
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
                 float salaire =  resultSet.getFloat("SUM(salaire)");
-                float SalaireMoyen = salaire/96;
-                //todo : salaire de retrait cest SalaireMoyen X PV/100;
+
+                String Query = "SELECT count(*) FROM salaire where matricule = ? ";
+                PreparedStatement preparedStatement1 = this.connection.prepareStatement(Query);
+                preparedStatement1.setString(1,matricule);
+                ResultSet resultSet1 = preparedStatement1.executeQuery();
+                if(resultSet1.next()){
+                    int NumberOFMonthlySalary =  resultSet1.getInt("count(*)");
+                    if(NumberOFMonthlySalary > 96){
+                        NumberOFMonthlySalary = 96;
+                    }
+                    float SalaireMoyenne = (float) salaire/NumberOFMonthlySalary;
+                    float TauxPV = (float) PV / 100;
+                    float RetirementSalary = SalaireMoyenne * TauxPV;
+
+                    //Print.log(RetirementSalary);
+                    if(RetirementSalary > 6000){
+                        RetirementSalary = 6000;
+                    } else if (RetirementSalary <1000) {
+                        RetirementSalary = 1000;
+                    }
+                    this.InsertRetirementSalary(matricule,RetirementSalary);
+                    return RetirementSalary;
+                }
+
             }
 
         }catch (SQLException e){
             e.printStackTrace();
         }
+        return 0;
+    }
+    public void InsertRetirementSalary(String matricule,float salaireRetrait){
+        try {
+            String Query = "update patients SET SalaireRetrait = ? where matricule  = ?";
+            PreparedStatement preparedStatement = this.connection.prepareStatement(Query);
+            preparedStatement.setFloat(1,salaireRetrait);
+            preparedStatement.setString(2,matricule);
+            preparedStatement.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public Patient CheckYourRetiremntSalaire(String matricule){
+
+        try {
+
+            String Query = "SELECT *FROM patients where matricule = ? ";
+            PreparedStatement preparedStatement = this.connection.prepareStatement(Query);
+            preparedStatement.setString(1,matricule);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if(resultSet.next()){
+                Patient patient = new Patient();
+                patient.setSalaire(resultSet.getFloat("Salaire"));
+                patient.setPensionVeillesse(resultSet.getInt("PensionV"));
+                patient.setNombreJourtravaille(resultSet.getInt("Numberwd"));
+                patient.setStatusretrait( resultSet.getString("statusRetraitment"));
+                patient.setSalaireRetrait( resultSet.getFloat("SalaireRetrait"));
+                return patient;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

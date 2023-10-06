@@ -2,6 +2,7 @@ package ma.yc.service.impl;
 
 import ma.yc.Mapper.impl.PatientMapper;
 import ma.yc.Mapper.impl.SocieteMapper;
+import ma.yc.core.Print;
 import ma.yc.dao.SocieteDao;
 import ma.yc.dao.impl.SocieteDaoImp;
 import ma.yc.dto.PatientDto;
@@ -37,7 +38,6 @@ public class SocieteServiceImp implements SocieteService {
         }
     }
 
-
     @Override
     public boolean ajouteEmployee(List<PatientDto> patientDtos, String idsociete) {
         for (PatientDto p: patientDtos){
@@ -53,8 +53,11 @@ public class SocieteServiceImp implements SocieteService {
         return false;
     }
     @Override
-    public void calculateRetraiteSalary(String matricule){
-        this.societeDao.calculateRetriatSalary(matricule);
+    public void calculateRetraiteSalary(){
+        List<Patient> patients = this.societeDao.selectEligible();
+        for (Patient p : patients){
+            this.societeDao.calculateRetriatSalary(p.getMatricule(),p.getPensionVeillesse());
+        }
     }
 
     @Override
@@ -81,5 +84,11 @@ public class SocieteServiceImp implements SocieteService {
     public void augmenterNombreJourTravaille(String matricule, int NJT) {
         this.societeDao.augmenterNombreJourTravaille(matricule,NJT);
     }
+    public PatientDto checkYourRetirementSalary(String matricule){
+        Patient patient = this.societeDao.CheckYourRetiremntSalaire(matricule);
+        PatientDto patientDto = this.patientMapper.toDto(patient);
+        return  patientDto;
+    }
+
 }
 

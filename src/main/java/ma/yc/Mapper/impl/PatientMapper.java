@@ -51,8 +51,19 @@ public class PatientMapper implements Mapper<PatientDto , Patient> {
     }
 
     @Override
-    public PatientDto toDto(Patient t) {
-        return null;
+
+    public PatientDto toDto(Patient patient) {
+        PatientDto patientDto = new PatientDto();
+        patientDto.matricule = patient.getMatricule();
+        patientDto.nom = patient.getNom();
+        patientDto.idsociete = patient.getIdSociete();
+        patientDto.salaire = patient.getSalaire();
+        patientDto.cotisationSalaire = patient.getCotisationSalaire();
+        patientDto.numberWorkingdays = patient.getNombreJourtravaille();
+        patientDto.statusRetrait = patient.getStatusretrait();
+        patientDto.pensionVeillesse = patient.getPensionVeillesse();
+        patientDto.salaireRetrait = patient.getSalaireRetrait();
+        return patientDto;
     }
 
     @Override
