@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.SimpleFormatter;
+import java.util.stream.Collectors;
 
 
 public class SocieteServiceImp implements SocieteService {
@@ -52,14 +53,23 @@ public class SocieteServiceImp implements SocieteService {
         }
         return false;
     }
+    /*
     @Override
     public void calculateRetraiteSalary(){
         List<Patient> patients = this.societeDao.selectEligible();
         for (Patient p : patients){
             this.societeDao.calculateRetriatSalary(p.getMatricule(),p.getPensionVeillesse());
         }
-    }
+    }*/
+    @Override
+    public void calculateRetraiteSalary(){
+        List<Patient> patients = this.societeDao.selectEligible1();
+        List<Patient> pateintPeutBenifier = patients.stream().filter(P -> P.getStatusretrait().equals(statusRetraitment.peut_bénéficier.toString())).collect(Collectors.toList());
+        for (Patient p : pateintPeutBenifier){
 
+            this.societeDao.calculateRetriatSalary(p.getMatricule(),p.getPensionVeillesse(),p.getSalaire());
+        }
+    }
     @Override
     public boolean accederDashboardSociete(String idSociete, String Password) {
         boolean state =  this.societeDao.accederSocieteDashboard(idSociete,Password);

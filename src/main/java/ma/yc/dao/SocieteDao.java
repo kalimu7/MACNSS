@@ -26,7 +26,10 @@ public interface SocieteDao {
 
     public List<Patient> selectEligible();
 
-    public float calculateRetriatSalary(String matricule,int PV);
+    public List<Patient> selectEligible1();
+
+
+    public float calculateRetriatSalary(String matricule, int PV,float Salary);
     public Patient CheckYourRetiremntSalaire(String matricule);
 
 }

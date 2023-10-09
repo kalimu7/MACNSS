@@ -30,6 +30,7 @@ public class SocieteGUI implements DisplayGUI{
     }
     @Override
     public int displayMainOptions(Scanner scanner) {
+        this.societeService.calculateRetraiteSalary();
         Print.log("Bienvenue dans l'application de gestion des patients");
         Print.log("1- Add your Own Company");
         Print.log("2- Get access To your Company Dahsboard");
@@ -129,9 +130,22 @@ public class SocieteGUI implements DisplayGUI{
                 Print.log("entrer votre matricule ");
                 String Matricule = scanner.nextLine();
                 PatientDto patientDto = this.societeService.checkYourRetirementSalary(Matricule);
-                Print.log("your salary " + patientDto.salaire);
-                Print.log("statusRetraitment " + patientDto.statusRetrait);
-                Print.log("your Retirement Salary " + patientDto.salaireRetrait);
+
+
+
+
+                System.out.println("----------------------------------------------------------------------------------------------------------------");
+                System.out.printf("| %-15s | %-15s | %-15s | %-20s | %-17s |\n",
+                        "Matricule", "Salary", "Number Jour travaille", "StatusRetraitment", "Retirement Salary");
+                System.out.println("----------------------------------------------------------------------------------------------------------------");
+
+
+
+                System.out.printf("| %-15s | %-15s | %-21d | %-21s | %-16f |\n",
+                        patientDto.matricule, patientDto.salaire, patientDto.numberWorkingdays,
+                        patientDto.statusRetrait, patientDto.salaireRetrait);
+
+                System.out.println("----------------------------------------------------------------------------------------------------------------");
 
             default:
                 Print.log("Enter a valid choice");
@@ -139,7 +153,7 @@ public class SocieteGUI implements DisplayGUI{
         return 0;
     }
     public void SocieteDashboard(Scanner scanner,String Soieteid){
-        this.societeService.calculateRetraiteSalary();
+
         scanner = new Scanner(System.in);
         Print.log("1- Add new Employee");
         Print.log("2- Increase Number of working days");

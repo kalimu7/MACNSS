@@ -122,7 +122,7 @@ public class SocieteDaoImp implements SocieteDao {
                 preparedStatement.setString(2,matricule);
                 preparedStatement.executeUpdate();
             }
-            if (NWD > 3240 && age >= 55) {
+            if (NWD >= 3240 && age >= 55) {
                 int plus = NWD - 3240;
                 plus = plus / 216;
                 int PV = 50 + plus;
@@ -132,7 +132,7 @@ public class SocieteDaoImp implements SocieteDao {
                 preparedStatement2.setString(2, statusRetraitment.peut_bénéficier.toString());
                 preparedStatement2.setString(3,matricule);
                 preparedStatement2.executeUpdate();
-            }else if(NWD > 3240 ){
+            }else if(NWD >= 3240 ){
                 int plus = NWD - 3240;
                 plus = plus / 216;
                 int PV = 50 + plus;
@@ -246,10 +246,32 @@ public class SocieteDaoImp implements SocieteDao {
         return null;
     }
 
+    public List<Patient> selectEligible1(){
+        try {
+            List<Patient> patients = new ArrayList<Patient>();
+            String Query = "SELECT *FROM patients ";
+            PreparedStatement preparedStatement = this.connection.prepareStatement(Query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                Patient patient = new Patient();
+                patient.setMatricule(resultSet.getString("matricule"));
+                patient.setPensionVeillesse(resultSet.getInt("PensionV"));
+                patient.setStatusretrait(resultSet.getString("statusRetraitment"));
+                patient.setSalaire(resultSet.getFloat("Salaire"));
+                patients.add(patient);
+            }
+            return patients;
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
 
     @Override
-    public float calculateRetriatSalary(String matricule, int PV){
+    public float calculateRetriatSalary(String matricule, int PV,float Salary){
         try{
 
             String Querry = "SELECT SUM(salaire) FROM (SELECT salaire FROM salaire WHERE matricule = ? ORDER BY id DESC LIMIT 96 ) AS subquery;";
@@ -265,19 +287,38 @@ public class SocieteDaoImp implements SocieteDao {
                 ResultSet resultSet1 = preparedStatement1.executeQuery();
                 if(resultSet1.next()){
                     int NumberOFMonthlySalary =  resultSet1.getInt("count(*)");
-                    if(NumberOFMonthlySalary > 96){
+                    float TauxPV = (float) PV / 100;
+                    if(PV == 50){
+
+                        if((float) Salary /2 > 6000){
+                            Salary = 6000;
+                        } else if ((float) Salary /2 <1000) {
+                            Salary = 1000;
+                        }
+                        this.InsertRetirementSalary(matricule,(float) Salary/2 );
+                        return Salary;
+                    }
+                    if(NumberOFMonthlySalary == 1){
+                        float RetirementSalay = (float) Salary * TauxPV;
+                        if(RetirementSalay > 6000){
+                            RetirementSalay = 6000;
+                        } else if (RetirementSalay <1000) {
+                            RetirementSalay = 1000;
+                        }
+                        //Print.log("matricule " + matricule + "Retirement Salary -----" + RetirementSalay);
+                        this.InsertRetirementSalary(matricule,RetirementSalay);
+                        return RetirementSalay;
+                    }else if(NumberOFMonthlySalary > 96){
                         NumberOFMonthlySalary = 96;
                     }
                     float SalaireMoyenne = (float) salaire/NumberOFMonthlySalary;
-                    float TauxPV = (float) PV / 100;
                     float RetirementSalary = SalaireMoyenne * TauxPV;
-
-                    //Print.log(RetirementSalary);
                     if(RetirementSalary > 6000){
                         RetirementSalary = 6000;
                     } else if (RetirementSalary <1000) {
                         RetirementSalary = 1000;
                     }
+                    //Print.log("matricule " + matricule + " Retirement Salary " + RetirementSalary);
                     this.InsertRetirementSalary(matricule,RetirementSalary);
                     return RetirementSalary;
                 }
@@ -310,6 +351,7 @@ public class SocieteDaoImp implements SocieteDao {
             ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
                 Patient patient = new Patient();
+                patient.setMatricule(resultSet.getString("matricule"));
                 patient.setSalaire(resultSet.getFloat("Salaire"));
                 patient.setPensionVeillesse(resultSet.getInt("PensionV"));
                 patient.setNombreJourtravaille(resultSet.getInt("Numberwd"));
@@ -322,5 +364,7 @@ public class SocieteDaoImp implements SocieteDao {
         }
         return null;
     }
+
+
 
 }
