@@ -134,18 +134,18 @@ public class SocieteGUI implements DisplayGUI{
 
 
 
-                System.out.println("----------------------------------------------------------------------------------------------------------------");
-                System.out.printf("| %-15s | %-15s | %-15s | %-20s | %-17s |\n",
-                        "Matricule", "Salary", "Number Jour travaille", "StatusRetraitment", "Retirement Salary");
-                System.out.println("----------------------------------------------------------------------------------------------------------------");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+                System.out.printf("| %-15s | %-15s | %-15s | %-20s | %-17s | %-15s |\n",
+                        "Matricule", "Salary", "Number Jour travaille", "StatusRetraitment", "Retirement Salary","Pension Veillesse");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
 
 
 
-                System.out.printf("| %-15s | %-15s | %-21d | %-21s | %-16f |\n",
+                System.out.printf("| %-15s | %-15s | %-21d | %-21s | %-16f | %-16d \n",
                         patientDto.matricule, patientDto.salaire, patientDto.numberWorkingdays,
-                        patientDto.statusRetrait, patientDto.salaireRetrait);
+                        patientDto.statusRetrait, patientDto.salaireRetrait,patientDto.pensionVeillesse);
 
-                System.out.println("----------------------------------------------------------------------------------------------------------------");
+                System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
 
             default:
                 Print.log("Enter a valid choice");
